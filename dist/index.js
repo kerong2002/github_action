@@ -5,7 +5,7 @@
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-const {Toolkit} = requier("actions-toolkit")
+const {Toolkit} = require("actions-toolkit")
 
 Toolkit.run(async(tools) => {
     tools.log.siccess("Start Success");
