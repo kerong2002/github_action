@@ -1,4 +1,4 @@
-const {Toolkit} = require("actions-toolkit")
+const { Toolkit } = require("actions-toolkit");
 
 Toolkit.run(async(tools) => {
     tools.log.siccess("Start Success");
