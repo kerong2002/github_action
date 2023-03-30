@@ -20345,23 +20345,26 @@ const owner = core.getInput("COMMIT_OWNER");
 const repo = core.getInput("COMMIT_REPO");
 
 
-async function getAllCppCount(owner, repo) {
-  const api = `https://api.github.com/repos/${owner}/${repo}/contents`;
-  const response = await fetch(api);
-  const contents = await response.json();
-
-  let count = 0;
-
-  for (const content of contents) {
-    if (content.type === 'file' && content.name.endsWith('.cpp')) {
-      count++;
-    } else if (content.type === 'dir') {
-      const subCount = await getAllCppCount(owner, repo, content.path);
-      count += subCount;
+async function countCppFiles() {
+    const response = await fetch('https://api.github.com/repos/{owner}/{repo}/contents');
+    const data = await response.json();
+  
+    let count = 0;
+  
+    for (const item of data) {
+      if (item.type === 'dir') {
+        const dirResponse = await fetch(item.url);
+        const dirData = await dirResponse.json();
+  
+        for (const file of dirData) {
+          if (file.name.endsWith('.cpp')) {
+            count++;
+          }
+        }
+      }
     }
-  }
-
-  return count;
+    console.log(`Found ${count} .cpp files in the repository.`);
+    return count;
 }
 
 
@@ -20478,8 +20481,8 @@ Toolkit.run(async (tools) => {
     // //過濾出所有的 `.cpp` 文件
     // const cppFiles = files.data.filter(file => file.name.endsWith('.cpp'));
     // const cppFileCount = cppFiles.length;
-    const cppFileCount = await getAllCppCount(owner, repo);
-    
+    const cppFileCount = await countCppFiles(owner, repo);
+
     const oldContent = readmeContent.slice(startIndex, endIndex-1).join("\n");
     const newContent = `**I have ${cppFileCount} cpp files.**`;
   
