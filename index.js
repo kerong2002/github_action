@@ -2,83 +2,38 @@ const core = require("@actions/core");
 const { Toolkit } = require('actions-toolkit');
 const fs = require("fs");
 const { spawn } = require("child_process");
-const fetch = require('node-fetch');
 
 const owner = core.getInput("COMMIT_OWNER");
 const repo = core.getInput("COMMIT_REPO");
 
 
-const github = require('@actions/github');
+import { Octokit } from "@octokit/rest";
 
-async function countCppFiles() {
-    try {
-        const octokit = github.getOctokit({ auth: process.env.GITHUB_TOKEN });
+const octokit = new Octokit({
+    auth: process.env.GITHUB_TOKEN,
+});
   
-      // Get all files in the repository
-      const response = await octokit.repos.getContents({
-        owner,
-        repo,
-        path: ''
-      });
+
+//   const owner = 'kerong2002';
+//   const repo = 'github_action';
   
-      let count = 0;
-  
-      // Find all files with extension '.cpp' and count them
-      for (const item of response.data) {
-        if (item.type === 'dir') {
-          const folderResponse = await octokit.repos.getContents({
-            owner,
-            repo,
-            path: item.path
-          });
-          for (const folderItem of folderResponse.data) {
-            if (folderItem.type === 'file' && folderItem.name.endsWith('.cpp')) {
-              count++;
-            }
-          }
-        } else if (item.type === 'file' && item.name.endsWith('.cpp')) {
-          count++;
-        }
+const files = await octokit.request('GET /repos/{owner}/{repo}/contents/', {
+    owner: owner,
+    repo: repo,
+});
+
+const countCppFiles = async (path) => {
+    let count = 0;
+    const files = await fs.promises.readdir(path, { withFileTypes: true });
+    for (const file of files) {
+      if (file.isDirectory()) {
+        count += await countCppFiles(path + '/' + file.name);
+      } else if (file.name.endsWith('.cpp')) {
+        count++;
       }
-  
-      console.log(`Total number of .cpp files in the repository: ${count}`);
-      return count;
-    } catch (error) {
-      console.error(error);
-      core.setFailed(error.message);
     }
-  }
-
-
-
-
-// import { Octokit } from "@octokit/rest";
-
-// const octokit = new Octokit({
-//     auth: process.env.GITHUB_TOKEN,
-//   });
-  
-
-// //   const owner = 'kerong2002';
-// //   const repo = 'github_action';
-  
-//   const files = await octokit.request('GET /repos/{owner}/{repo}/contents/', {
-//     owner: owner,
-//     repo: repo,
-//   });
-
-// const countCppFiles = async (path) => {
-//     let count = 0;
-//     const files = await fs.promises.readdir(path, { withFileTypes: true });
-//     for (const file of files) {
-//       if (file.isDirectory()) {
-//         count += await countCppFiles(path + '/' + file.name);
-//       } else if (file.name.endsWith('.cpp')) {
-//         count++;
-//       }
-//     }
-//     return count;
-//   };
+    return count;
+};
   
 // yml input
 const GITHUB_TOKEN = core.getInput("GITHUB_TOKEN");
@@ -159,11 +114,9 @@ Toolkit.run(async (tools) => {
         endIndex++;
     }
 
-    // //過濾出所有的 `.cpp` 文件
-    // const cppFiles = files.data.filter(file => file.name.endsWith('.cpp'));
-    // const cppFileCount = cppFiles.length;
-    let cppFileCount = 0;
-    cppFileCount = await countCppFiles();
+
+    const cppFileCount = countCppFiles();
+
 
     const oldContent = readmeContent.slice(startIndex, endIndex-1).join("\n");
     const newContent = `**I have ${cppFileCount} cpp files.**`;
