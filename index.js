@@ -22,7 +22,7 @@ Toolkit.run(async (tools) => {
     path: 'README.md',
     message: 'Update README',
     content: Buffer.from(readmeContent).toString('base64'),
-    sha: tools.context.payload.head_commit.id
+    sha: data[0].sha // sha 值需要使用当前 README 文件的 sha 值
   });
 
   tools.log.success(`Updated README with ${cppFiles.length} C++ files`);
