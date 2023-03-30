@@ -9,7 +9,7 @@ Toolkit.run(async (tools) => {
   const octokit = new Octokit({ auth: `token ${process.env.GITHUB_TOKEN}` });
 
   // Get the contents of the repository
-  const { data } = await octokit.repos.getContents({ owner, repo });
+  const { data } = await octokit.repos.getContent({ owner, repo, path: '' });
 
   // Filter the contents to include only C++ files
   const cppFiles = data.filter(file => file.name.endsWith('.cpp'));
@@ -22,7 +22,7 @@ Toolkit.run(async (tools) => {
     path: 'README.md',
     message: 'Update README',
     content: Buffer.from(readmeContent).toString('base64'),
-    sha: data[0].sha // sha 值需要使用当前 README 文件的 sha 值
+    sha: tools.context.payload.head_commit.id
   });
 
   tools.log.success(`Updated README with ${cppFiles.length} C++ files`);
