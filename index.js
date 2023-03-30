@@ -2,24 +2,60 @@ const core = require("@actions/core");
 const { Toolkit } = require('actions-toolkit');
 const fs = require("fs");
 const { spawn } = require("child_process");
+const fetch = require('node-fetch');
 
-import { Octokit } from "@octokit/rest";
+const owner = core.getInput("COMMIT_OWNER");
+const repo = core.getInput("COMMIT_REPO");
 
-const octokit = new Octokit({
-    auth: process.env.GITHUB_TOKEN,
-  });
+async function getAllCppCount(owner, repo) {
+  const api = `https://api.github.com/repos/${owner}/${repo}/contents`;
+  const response = await fetch(api);
+  const contents = await response.json();
+
+  let count = 0;
+
+  for (const content of contents) {
+    if (content.type === 'file' && content.name.endsWith('.cpp')) {
+      count++;
+    } else if (content.type === 'dir') {
+      const subCount = await getAllCppCount(owner, repo, content.path);
+      count += subCount;
+    }
+  }
+
+  return count;
+}
+
+
+
+// import { Octokit } from "@octokit/rest";
+
+// const octokit = new Octokit({
+//     auth: process.env.GITHUB_TOKEN,
+//   });
   
-    const owner = core.getInput("COMMIT_OWNER");
-    const repo = core.getInput("COMMIT_REPO");
-//   const owner = 'kerong2002';
-//   const repo = 'github_action';
+
+// //   const owner = 'kerong2002';
+// //   const repo = 'github_action';
   
-  const files = await octokit.request('GET /repos/{owner}/{repo}/contents/', {
-    owner: owner,
-    repo: repo,
-  });
+//   const files = await octokit.request('GET /repos/{owner}/{repo}/contents/', {
+//     owner: owner,
+//     repo: repo,
+//   });
 
-
+// const countCppFiles = async (path) => {
+//     let count = 0;
+//     const files = await fs.promises.readdir(path, { withFileTypes: true });
+//     for (const file of files) {
+//       if (file.isDirectory()) {
+//         count += await countCppFiles(path + '/' + file.name);
+//       } else if (file.name.endsWith('.cpp')) {
+//         count++;
+//       }
+//     }
+//     return count;
+//   };
+  
 // yml input
 const GITHUB_TOKEN = core.getInput("GITHUB_TOKEN");
 const COMMITTER_USERNAME = core.getInput("COMMITTER_USERNAME");
@@ -99,10 +135,16 @@ Toolkit.run(async (tools) => {
         endIndex++;
     }
 
-    //過濾出所有的 `.cpp` 文件
-    const cppFiles = files.data.filter(file => file.name.endsWith('.cpp'));
-    const cppFileCount = cppFiles.length;
-
+    // //過濾出所有的 `.cpp` 文件
+    // const cppFiles = files.data.filter(file => file.name.endsWith('.cpp'));
+    // const cppFileCount = cppFiles.length;
+    try {
+        const cppFileCount = await getAllCppCount(owner, repo);
+        console.log(cppFileCount);
+    // 接下來就可以使用 count 變數來更新 README 檔案了
+    } catch (error) {
+        console.error(error);
+    }
     const oldContent = readmeContent.slice(startIndex, endIndex-1).join("\n");
     const newContent = `**I have ${cppFileCount} cpp files.**`;
   
