@@ -20338,7 +20338,7 @@ var __webpack_exports__ = {};
 const { Toolkit } = __nccwpck_require__(7045);
 
 Toolkit.run(async(tools) => {
-    tools.log.siccess("Start Success");
+    tools.log.success("Start Success");
     tools.exit.success("Exit Success");
 });
 })();
