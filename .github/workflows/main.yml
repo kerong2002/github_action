@@ -7,15 +7,6 @@ jobs:
       contents: write
     name: Updates_README
     steps:
-      - name: Count .cpp files
-        run: |
-          count=$(find . -name "*.cpp" | wc -l)
-          echo "::set-output name=cpp_count::$count"
-        id: count_cpp
-
-      - name: Do something with the count
-        run: |
-          echo "There are ${{ steps.count_cpp.outputs.cpp_count }} .cpp files in the repository"
       - uses: actions/checkout@v3
       - name: Updates_README
         uses: kerong2002/github_action@main
