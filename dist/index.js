@@ -20340,7 +20340,7 @@ const { Toolkit } = __nccwpck_require__(7045);
 Toolkit.run(async (tools) => {
     tools.log.success("Edit README.md Start...");
 
-    tools.log.success(`Updated README with ${cppFiles.length} C++ files`);
+    tools.log.exit("Exit Edit README.md Action");
 });
 
 })();
