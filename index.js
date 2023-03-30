@@ -82,6 +82,20 @@ Toolkit.run(async (tools) => {
         endIndex++;
     }
 
+
+    const oldContent = readmeContent.slice(startIndex, endIndex-1).join("\n");
+    const newContent = 'kerong';
+  
+    const compareOldContent = oldContent.replace(/(?:\\[rn]|[\r\n]+)+/g, "");
+  
+    const compareNewContent = newContent.replace(/(?:\\[rn]|[\r\n]+)+/g, "");
+
+    // tools.log(compareOldContent);
+    // tools.log(compareNewContent);
+
+    if (compareOldContent === compareNewContent)
+      tools.exit.success("Same result");
+    
     // 把 <!--  UPDATE_README:START --> 到 <!-- UPDATE_README:END -->間的內容刪掉
     // 取得 START ~ END 的間隙
     let gap = endIndex - startIndex;
@@ -95,14 +109,18 @@ Toolkit.run(async (tools) => {
         )
     }
 
+    tools.log.success("Updated README with the recent blog outline");
+
     fs.writeFileSync("./README.md", readmeContent.join("\n"));
-	try {
+	
+    try {
 		await commitReadmeFile();
 		tools.log.success("Commit file success");
 	} catch (err) {
 		tools.log.debug("Something went wrong");
 		return tools.exit.failure(err);
 	}
+
 
     tools.exit.success("Exit Edit README.md Action");
 });
