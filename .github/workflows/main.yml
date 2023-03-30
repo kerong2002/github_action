@@ -6,7 +6,7 @@ jobs:
     permission:
       contents: write
     name: Updates_README
-    step:
+    steps:
       - uses: actions/checkout@3
       - name: Updates_README
         uses: kerong2002/github_action@main
