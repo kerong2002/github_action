@@ -4,6 +4,7 @@ const fs = require("fs");
 const { spawn } = require("child_process");
 
 import { Octokit } from "@octokit/rest";
+
 const octokit = new Octokit({
     auth: process.env.GITHUB_TOKEN,
   });
@@ -101,7 +102,7 @@ Toolkit.run(async (tools) => {
     const cppFileCount = cppFiles.length;
 
     const oldContent = readmeContent.slice(startIndex, endIndex-1).join("\n");
-    const newContent = 'I have  ${cppFileCount} ".cpp files\n';
+    const newContent = `I have ${cppFileCount} ".cpp" files\n`;
   
     const compareOldContent = oldContent.replace(/(?:\\[rn]|[\r\n]+)+/g, "");
   
@@ -122,7 +123,7 @@ Toolkit.run(async (tools) => {
         readmeContent.splice(
             startIndex,
             0,
-            'I have  ${cppFileCount} ".cpp files\n'
+            `I have ${cppFileCount} ".cpp" files\n`
         )
     }
 

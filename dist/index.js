@@ -14,6 +14,7 @@ const fs = __nccwpck_require__(7147);
 const { spawn } = __nccwpck_require__(2081);
 
 
+
 const octokit = new _octokit_rest__WEBPACK_IMPORTED_MODULE_0__/* .Octokit */ .v({
     auth: process.env.GITHUB_TOKEN,
   });
@@ -111,7 +112,7 @@ Toolkit.run(async (tools) => {
     const cppFileCount = cppFiles.length;
 
     const oldContent = readmeContent.slice(startIndex, endIndex-1).join("\n");
-    const newContent = 'I have  ${cppFileCount} ".cpp files\n';
+    const newContent = `I have ${cppFileCount} ".cpp" files\n`;
   
     const compareOldContent = oldContent.replace(/(?:\\[rn]|[\r\n]+)+/g, "");
   
@@ -132,7 +133,7 @@ Toolkit.run(async (tools) => {
         readmeContent.splice(
             startIndex,
             0,
-            'I have  ${cppFileCount} ".cpp files\n'
+            `I have ${cppFileCount} ".cpp" files\n`
         )
     }
 
