@@ -22928,42 +22928,45 @@ const repo = core.getInput("COMMIT_REPO");
 
 
 const github = __nccwpck_require__(5438);
-const octokit = new github.GitHub(process.env.GITHUB_TOKEN);
 
 async function countCppFiles() {
-  try {
-    const response = await octokit.repos.getContents({
-      owner,
-      repo,
-      path: ''
-    });
-
-    let count = 0;
-
-    for (const item of response.data) {
-      if (item.type === 'dir') {
-        const folderResponse = await octokit.repos.getContents({
-          owner,
-          repo,
-          path: item.path
-        });
-        for (const folderItem of folderResponse.data) {
-          if (folderItem.type === 'file' && folderItem.name.endsWith('.cpp')) {
-            count++;
+    try {
+      const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
+  
+      // Get all files in the repository
+      const response = await octokit.repos.getContents({
+        owner,
+        repo,
+        path: ''
+      });
+  
+      let count = 0;
+  
+      // Find all files with extension '.cpp' and count them
+      for (const item of response.data) {
+        if (item.type === 'dir') {
+          const folderResponse = await octokit.repos.getContents({
+            owner,
+            repo,
+            path: item.path
+          });
+          for (const folderItem of folderResponse.data) {
+            if (folderItem.type === 'file' && folderItem.name.endsWith('.cpp')) {
+              count++;
+            }
           }
+        } else if (item.type === 'file' && item.name.endsWith('.cpp')) {
+          count++;
         }
-      } else if (item.type === 'file' && item.name.endsWith('.cpp')) {
-        count++;
       }
+  
+      console.log(`Total number of .cpp files in the repository: ${count}`);
+      return count;
+    } catch (error) {
+      console.error(error);
+      core.setFailed(error.message);
     }
-
-    console.log(`Total number of .cpp files in the repository: ${count}`);
-    return count;
-  } catch (error) {
-    console.error(error);
-    core.setFailed(error.message);
   }
-}
 
 
 
