@@ -3,6 +3,20 @@ const { Toolkit } = require('actions-toolkit');
 const fs = require("fs");
 const { spawn } = require("child_process");
 
+import { Octokit } from "@octokit/rest";
+const octokit = new Octokit({
+    auth: process.env.GITHUB_TOKEN,
+  });
+  
+  const owner = 'kerong2002';
+  const repo = 'github_action';
+  
+  const files = await octokit.request('GET /repos/{owner}/{repo}/contents/', {
+    owner: owner,
+    repo: repo,
+  });
+
+
 // yml input
 const GITHUB_TOKEN = core.getInput("GITHUB_TOKEN");
 const COMMITTER_USERNAME = core.getInput("COMMITTER_USERNAME");
@@ -82,8 +96,8 @@ Toolkit.run(async (tools) => {
         endIndex++;
     }
 
-    const files = fs.readdirSync(repoPath);
-    const cppFiles = files.filter((filename) => filename.endsWith('.cpp'));
+    //過濾出所有的 `.cpp` 文件
+    const cppFiles = files.data.filter(file => file.name.endsWith('.cpp'));
     const cppFileCount = cppFiles.length;
 
     const oldContent = readmeContent.slice(startIndex, endIndex-1).join("\n");
