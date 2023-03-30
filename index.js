@@ -8,28 +8,43 @@ const owner = core.getInput("COMMIT_OWNER");
 const repo = core.getInput("COMMIT_REPO");
 
 
+const github = require('@actions/github');
+const octokit = new github.GitHub(process.env.GITHUB_TOKEN);
+
 async function countCppFiles() {
-    const response = await fetch('https://api.github.com/repos/{owner}/{repo}/contents');
-    const data = await response.json();
-  
+  try {
+    const response = await octokit.repos.getContents({
+      owner,
+      repo,
+      path: ''
+    });
+
     let count = 0;
-  
-    for (const item of data) {
+
+    for (const item of response.data) {
       if (item.type === 'dir') {
-        const dirResponse = await fetch(item.url);
-        const dirData = await dirResponse.json();
-  
-        for (const file of dirData) {
-          if (file.name.endsWith('.cpp')) {
+        const folderResponse = await octokit.repos.getContents({
+          owner,
+          repo,
+          path: item.path
+        });
+        for (const folderItem of folderResponse.data) {
+          if (folderItem.type === 'file' && folderItem.name.endsWith('.cpp')) {
             count++;
           }
         }
+      } else if (item.type === 'file' && item.name.endsWith('.cpp')) {
+        count++;
       }
     }
-    console.log(`Found ${count} .cpp files in the repository.`);
-    return count;
-}
 
+    console.log(`Total number of .cpp files in the repository: ${count}`);
+    return count;
+  } catch (error) {
+    console.error(error);
+    core.setFailed(error.message);
+  }
+}
 
 
 
@@ -144,7 +159,8 @@ Toolkit.run(async (tools) => {
     // //過濾出所有的 `.cpp` 文件
     // const cppFiles = files.data.filter(file => file.name.endsWith('.cpp'));
     // const cppFileCount = cppFiles.length;
-    const cppFileCount = await countCppFiles(owner, repo);
+    let cppFileCount = 0;
+    cppFileCount = await countCppFiles();
 
     const oldContent = readmeContent.slice(startIndex, endIndex-1).join("\n");
     const newContent = `**I have ${cppFileCount} cpp files.**`;
