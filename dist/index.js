@@ -20344,6 +20344,7 @@ const fetch = __nccwpck_require__(467);
 const owner = core.getInput("COMMIT_OWNER");
 const repo = core.getInput("COMMIT_REPO");
 
+
 async function getAllCppCount(owner, repo) {
   const api = `https://api.github.com/repos/${owner}/${repo}/contents`;
   const response = await fetch(api);
@@ -20362,6 +20363,8 @@ async function getAllCppCount(owner, repo) {
 
   return count;
 }
+
+
 
 
 
@@ -20475,14 +20478,8 @@ Toolkit.run(async (tools) => {
     // //過濾出所有的 `.cpp` 文件
     // const cppFiles = files.data.filter(file => file.name.endsWith('.cpp'));
     // const cppFileCount = cppFiles.length;
-    let cppFileCount = 0; // 定義並初始化 cppFileCount 變數
-    try {
-        cppFileCount = await getAllCppCount(owner, repo);
-        console.log(cppFileCount);
-    // 接下來就可以使用 count 變數來更新 README 檔案了
-    } catch (error) {
-        console.error(error);
-    }
+    const cppFileCount = await getAllCppCount(owner, repo);
+    
     const oldContent = readmeContent.slice(startIndex, endIndex-1).join("\n");
     const newContent = `**I have ${cppFileCount} cpp files.**`;
   
