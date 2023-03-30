@@ -3,7 +3,7 @@ on: [push]
 jobs:
   update_readme_job:
     runs-on: ubuntu-latest
-    permission:
+    permissions:
       contents: write
     name: Updates_README
     steps:
