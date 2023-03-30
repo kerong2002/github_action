@@ -5,20 +5,55 @@ const { spawn } = require("child_process");
 
 import { Octokit } from "@octokit/rest";
 
-const octokit = new Octokit({
-    auth: process.env.GITHUB_TOKEN,
-  });
+const owner = core.getInput("COMMIT_OWNER");
+const repo = core.getInput("COMMIT_REPO");
+
+
   
-    const owner = core.getInput("COMMIT_OWNER");
-    const repo = core.getInput("COMMIT_REPO");
+
 //   const owner = 'kerong2002';
 //   const repo = 'github_action';
   
-  const files = await octokit.request('GET /repos/{owner}/{repo}/contents/', {
-    owner: owner,
-    repo: repo,
-  });
 
+
+async function countCppFiles(owner, repo) {
+    try {
+      const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
+  
+      // Get all files in the repository
+      const response = await octokit.repos.getContents({
+        owner,
+        repo,
+        path: ''
+      });
+  
+      let count = 0;
+  
+      // Find all files with extension '.cpp' and count them
+      for (const item of response.data) {
+        if (item.type === 'dir') {
+          const folderResponse = await octokit.repos.getContents({
+            owner,
+            repo,
+            path: item.path
+          });
+          for (const folderItem of folderResponse.data) {
+            if (folderItem.type === 'file' && folderItem.name.endsWith('.cpp')) {
+              count++;
+            }
+          }
+        } else if (item.type === 'file' && item.name.endsWith('.cpp')) {
+          count++;
+        }
+      }
+  
+      console.log(`Total number of .cpp files in the repository: ${count}`);
+      return count;
+    } catch (error) {
+      console.error(error);
+      core.setFailed(error.message);
+    }
+}
 
 // yml input
 const GITHUB_TOKEN = core.getInput("GITHUB_TOKEN");
@@ -99,9 +134,9 @@ Toolkit.run(async (tools) => {
         endIndex++;
     }
 
-    //過濾出所有的 `.cpp` 文件
-    const cppFiles = files.data.filter(file => file.name.endsWith('.cpp'));
-    const cppFileCount = cppFiles.length;
+    const cppFileCount = await countCppFiles(owner, repo);
+
+    console.log(`Total number of .cpp files in the repository: ${cppFileCount}`);
 
     const oldContent = readmeContent.slice(startIndex, endIndex-1).join("\n");
     const newContent = `**I have ${cppFileCount} cpp files.**`;
