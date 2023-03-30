@@ -20419,9 +20419,12 @@ Toolkit.run(async (tools) => {
         endIndex++;
     }
 
+    const files = fs.readdirSync(repoPath);
+    const cppFiles = files.filter((filename) => filename.endsWith('.cpp'));
+    const cppFileCount = cppFiles.length;
 
     const oldContent = readmeContent.slice(startIndex, endIndex-1).join("\n");
-    const newContent = 'kerong';
+    const newContent = 'I have  ${cppFileCount} ".cpp files\n';
   
     const compareOldContent = oldContent.replace(/(?:\\[rn]|[\r\n]+)+/g, "");
   
@@ -20442,7 +20445,7 @@ Toolkit.run(async (tools) => {
         readmeContent.splice(
             startIndex,
             0,
-            'kerong'
+            'I have  ${cppFileCount} ".cpp files\n'
         )
     }
 
