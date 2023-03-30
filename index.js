@@ -138,8 +138,9 @@ Toolkit.run(async (tools) => {
     // //過濾出所有的 `.cpp` 文件
     // const cppFiles = files.data.filter(file => file.name.endsWith('.cpp'));
     // const cppFileCount = cppFiles.length;
+    let cppFileCount = 0; // 定義並初始化 cppFileCount 變數
     try {
-        const cppFileCount = await getAllCppCount(owner, repo);
+        cppFileCount = await getAllCppCount(owner, repo);
         console.log(cppFileCount);
     // 接下來就可以使用 count 變數來更新 README 檔案了
     } catch (error) {
