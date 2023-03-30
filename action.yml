@@ -22,6 +22,14 @@ inputs:
     description: "Commit message"
     default: "Update blog outline"
     required: false
+  COMMIT_OWNER:
+    description: "Commit owner"
+    default: "Update owner"
+    required: false
+  COMMIT_REPO:
+    description: "Commit repo"
+    default: "Update repo"
+    required: false
 
 runs:
   using: 'node16'

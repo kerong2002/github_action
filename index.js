@@ -9,8 +9,10 @@ const octokit = new Octokit({
     auth: process.env.GITHUB_TOKEN,
   });
   
-  const owner = 'kerong2002';
-  const repo = 'github_action';
+    const owner = core.getInput("COMMIT_OWNER");
+    const repo = core.getInput("COMMIT_REPO");
+//   const owner = 'kerong2002';
+//   const repo = 'github_action';
   
   const files = await octokit.request('GET /repos/{owner}/{repo}/contents/', {
     owner: owner,
