@@ -22931,7 +22931,7 @@ const github = __nccwpck_require__(5438);
 
 async function countCppFiles() {
     try {
-      const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
+        const octokit = github.getOctokit({ auth: process.env.GITHUB_TOKEN });
   
       // Get all files in the repository
       const response = await octokit.repos.getContents({
