@@ -3,18 +3,14 @@ const { Toolkit } = require('actions-toolkit');
 const fs = require("fs");
 const { spawn } = require("child_process");
 
-import { Octokit } from "@octokit/rest";
 
+const github = require('@actions/github');
 const owner = core.getInput("COMMIT_OWNER");
 const repo = core.getInput("COMMIT_REPO");
 
 
-  
-
 //   const owner = 'kerong2002';
 //   const repo = 'github_action';
-  
-
 
 async function countCppFiles(owner, repo) {
     try {
