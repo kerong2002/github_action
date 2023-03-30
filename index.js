@@ -3,38 +3,23 @@ const { Toolkit } = require('actions-toolkit');
 const fs = require("fs");
 const { spawn } = require("child_process");
 
-const owner = core.getInput("COMMIT_OWNER");
-const repo = core.getInput("COMMIT_REPO");
-
-
 import { Octokit } from "@octokit/rest";
 
 const octokit = new Octokit({
     auth: process.env.GITHUB_TOKEN,
-});
+  });
   
-
+    const owner = core.getInput("COMMIT_OWNER");
+    const repo = core.getInput("COMMIT_REPO");
 //   const owner = 'kerong2002';
 //   const repo = 'github_action';
   
-const files = await octokit.request('GET /repos/{owner}/{repo}/contents/', {
+  const files = await octokit.request('GET /repos/{owner}/{repo}/contents/', {
     owner: owner,
     repo: repo,
-});
+  });
 
-const countCppFiles = async (path) => {
-    let count = 0;
-    const files = await fs.promises.readdir(path, { withFileTypes: true });
-    for (const file of files) {
-      if (file.isDirectory()) {
-        count += await countCppFiles(path + '/' + file.name);
-      } else if (file.name.endsWith('.cpp')) {
-        count++;
-      }
-    }
-    return count;
-};
-  
+
 // yml input
 const GITHUB_TOKEN = core.getInput("GITHUB_TOKEN");
 const COMMITTER_USERNAME = core.getInput("COMMITTER_USERNAME");
@@ -114,9 +99,9 @@ Toolkit.run(async (tools) => {
         endIndex++;
     }
 
-
-    const cppFileCount = countCppFiles();
-
+    //過濾出所有的 `.cpp` 文件
+    const cppFiles = files.data.filter(file => file.name.endsWith('.cpp'));
+    const cppFileCount = cppFiles.length;
 
     const oldContent = readmeContent.slice(startIndex, endIndex-1).join("\n");
     const newContent = `**I have ${cppFileCount} cpp files.**`;
