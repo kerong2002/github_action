@@ -1,6 +1,6 @@
 # Count cpp file
 <!--  UPDATE_README:START -->
-**I have 3 cpp files.**
+**I have 2 cpp files.**
 <!-- UPDATE_README:END -->
 Usage
 Add the following two strings to your README.md file where you want the update to appear:
