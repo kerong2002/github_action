@@ -30,6 +30,10 @@ inputs:
     description: "Commit repo"
     default: "Update repo"
     required: false
+  COMMIT_PATH:
+    description: "Path to directory in the repo"
+    default: ""
+    required: false
 
 runs:
   using: 'node16'
