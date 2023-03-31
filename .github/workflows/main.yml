@@ -16,3 +16,4 @@ jobs:
           COMMITTER_EMAIL: "krameri120@gmail.com"
           COMMIT_REPO: "github_action"
           COMMIT_OWNER: "kerong2002"
+          COMMIT_PATH: "test"
