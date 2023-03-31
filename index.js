@@ -11,15 +11,17 @@ const octokit = new Octokit({
   
 const owner = core.getInput("COMMIT_OWNER");
 const repo = core.getInput("COMMIT_REPO");
-const path = core.getInput("COMMIT_PATH");
+const path = core.getInput("COMMIT_PATH") || ''; 
 //   const owner = 'kerong2002';
 //   const repo = 'github_action';
   
-  const files = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
-    owner: owner,
-    repo: repo,
-	path: path,
-  });
+console.log(`Owner: ${owner}, Repo: ${repo}, Path: ${path}`);
+
+const files = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
+  owner: owner,
+  repo: repo,
+  path: path,
+});
 
 
 // yml input
