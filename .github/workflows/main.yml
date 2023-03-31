@@ -12,8 +12,7 @@ jobs:
         uses: kerong2002/github_action@main
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COMMITTER_EMAIL: ${{ secrets.EMAIL_SECRET }}
           COMMITTER_USERNAME: "kerong2002"
-          COMMITTER_EMAIL: "krameri120@gmail.com"
           COMMIT_REPO: "github_action"
           COMMIT_OWNER: "kerong2002"
-          COMMIT_PATH: "test"
